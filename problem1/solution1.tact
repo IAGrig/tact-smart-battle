@@ -17,17 +17,45 @@ struct Init {
 }
 
 contract Proposal {
+    proposalId: Int as uint32;
+    votingEndingAt: Int as uint32;
+    voters: map<Address, Bool>;
+    yesVotesCount: Int as uint32;
+    noVotesCount: Int as uint32;
+
     init(data: Init) {
+        self.proposalId = data.proposalId;
+        self.votingEndingAt = data.votingEndingAt;
+        self.voters = emptyMap();
+        self.yesVotesCount = 0;
+        self.noVotesCount = 0;
     }
 
     // deploy
     receive() { }
 
     receive(msg: Vote) {
-        // TODO: implement
+        let sender: Address = sender();
+        throwUnless(1000, now() <= self.votingEndingAt);
+        throwUnless(1001, self.yesVotesCount + self.noVotesCount < 100);
+        throwUnless(1002, !self.voters.exists(sender));
+
+
+        self.voters.set(sender, true);
+        if (msg.value) {
+            self.yesVotesCount += 1;
+        } else {
+            self.noVotesCount += 1;
+        }
+
+        cashback(sender());
     }
 
     get fun proposalState(): ProposalState {
-        // TODO: implement
+        return ProposalState {
+            yesCount: self.yesVotesCount,
+            noCount: self.noVotesCount
+        };
     }
 }
+
