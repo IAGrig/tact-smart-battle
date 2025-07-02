@@ -1,3 +1,5 @@
+This repository is a copy of original organizers repository with contest information, statements of problems and templates of solutions. 95% of content here was written by them. Only solutions in `problemN/solutionN.tact` are mine.
+
 # 🧠 Tact Smart Battle 🤜🤛
 
 ### Organized by [TON Studio](https://tonstudio.io/) & [Codeforces](https://codeforces.com/)
