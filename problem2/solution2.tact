@@ -14,15 +14,14 @@ contract ProposalMaster {
     receive() { }
 
     receive(msg: DeployNewProposal) {
-        if (now() <= msg.votingEndingAt) {
-            deploy(DeployParameters{
-                init: initOf Proposal(ProposalInit{ master: myAddress(), proposalId: self.nextProposalId }),
-                body: msg.toCell(),
-                mode: SendRemainingValue + SendIgnoreErrors,
-                value: ton("0"),
-            });
-            self.nextProposalId += 1;
-        }
+        throwUnless(1020, now() <= msg.votingEndingAt);
+		deploy(DeployParameters{
+			init: initOf Proposal(ProposalInit{ master: myAddress(), proposalId: self.nextProposalId }),
+			body: msg.toCell(),
+			mode: SendRemainingValue + SendIgnoreErrors,
+			value: ton("0"),
+		});
+		self.nextProposalId += 1;
     }
 
     get fun nextProposalId(): Int {
@@ -53,7 +52,7 @@ contract Proposal {
     voters: map<Address, Bool>;
 
     init(data: ProposalInit) {
-        throwUnless(2025, data.master == sender() && data.master == contractAddress(initOf ProposalMaster()));
+		throwUnless(2025, data.master == sender());
         self.master = data.master;
         self.proposalId = data.proposalId;
         self.yesCount = 0;
@@ -62,6 +61,7 @@ contract Proposal {
     }
 
     receive(msg: DeployNewProposal) {
+		throwUnless(2025, self.master == sender());
         self.votingEndingAt = msg.votingEndingAt;
     }
 
